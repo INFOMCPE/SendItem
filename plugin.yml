@@ -7,5 +7,5 @@ load: STARTUP
 website: infomcpe.ru
 commands:
     itemsend:
-        description: "Отправка придметов"
+        description: "Отправка предметов"
         aliases: [is]
