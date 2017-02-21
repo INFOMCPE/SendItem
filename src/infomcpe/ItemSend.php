@@ -40,19 +40,20 @@ class ItemSend extends PluginBase implements Listener {
                     if($this->getOnline($this->session->getSessionData(strtolower($player->getName()), 'sendto'))){
                     $player->getInventory()->removeItem(Item::get($id, $damage, $message));
                     $this->session->createSession($this->session->getSessionData(strtolower($player->getName()), 'sendto'), 'item', $id.':'.$damage.':'.$message);
+                    $this->session->createSession($this->session->getSessionData(strtolower($player->getName()), 'sendto'), 'sendby', strtolower($player->getName()));
                     $this->getServer()->getPlayer($this->session->getSessionData(strtolower($player->getName()), 'sendto'))->sendMessage(ItemSend::Prfix."Игрок ".$player->getName().' Отправил вам '.Item::get($id)->getName()." в количестве: ".$message.". \nДля того чтобы получить напишите /is accept. Чтобы отклонить /is deny");
-                    
-                    $player->sendMessage(ItemSend::Prfix."Успешно. Запрос на получение отправлен игроку ".$this->session->getSessionData(strtolower($player->getName()), 'sendto'));
+                    $this->getServer()->getScheduler()->scheduleDelayedTask(new tpTimer($this, $this->session->getSessionData(strtolower($player->getName()), 'sendto')), 20*120);
+                    $player->sendMessage(ItemSend::Prfix."§aУспешно§e. Запрос на получение отправлен игроку ".$this->session->getSessionData(strtolower($player->getName()), 'sendto'));
                     } else {
-                        $player->sendMessage(ItemSend::Prfix."Ошибка. Пока вы проводили все ети действия игрок которому вы собирались отправить покинул сервер");
+                        $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. Пока вы проводили все ети действия игрок которому вы собирались отправить покинул сервер");
                          $event->setCancelled(TRUE);
                     }
                     } else {
-                        $player->sendMessage(ItemSend::Prfix."Ошибка. В вашем инвентаре меньше блоков чем вы указали");
+                        $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. В вашем инвентаре меньше блоков чем вы указали");
                          $event->setCancelled(TRUE);
                     }
                 }else{
-                    $player->sendMessage(ItemSend::Prfix."Ошибка. Пожалуйста напишите количество в виде числа");
+                    $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. Пожалуйста напишите количество в виде числа");
                      $event->setCancelled(TRUE);
                 }
             }
@@ -66,10 +67,10 @@ class ItemSend extends PluginBase implements Listener {
              $this->session->createSession(strtolower($player->getName()), 'item', $event->getItem()->getId().':'.$event->getItem()->getDamage().':'.$event->getItem()->getCount());
              $this->session->createSession(strtolower($player->getName()), 'getchat', true);
              $this->session->createSession(strtolower($player->getName()), 'sendto', $sendto);
-             $player->sendMessage(ItemSend::Prfix.'Успешно. Предмет успешно получен теперь напишите в чат количиство которе xотите отправить');
+             $player->sendMessage(ItemSend::Prfix.'Предмет §aУспешно§e получен теперь напишите в чат количиство которе xотите отправить');
              $event->setCancelled(TRUE);
          } else {
-             $player->sendMessage(ItemSend::Prfix."Ошибка. Траспортировка воздуxа запрещена!");
+             $player->sendMessage(ItemSend::Prfix."§4Ошибка§f.§e Траспортировка воздуxа запрещена!");
          }
          
              }
@@ -89,15 +90,15 @@ class ItemSend extends PluginBase implements Listener {
                                     if($this->getOnline($args[1])){
                                         $this->session->createSession(strtolower($sender->getName()), 'senditem', TRUE);
                                          $this->session->createSession(strtolower($sender->getName()), 'sendto', strtolower($args[1]));
-                                        $sender->sendMessage(ItemSend::Prfix."Успешно. Нажмите по земле тем предметом который xотите отправить");
+                                        $sender->sendMessage(ItemSend::Prfix."§aУспешно§e. Нажмите по земле тем предметом который xотите отправить");
                                     } else {
-                                        $sender->sendMessage(ItemSend::Prfix."Ощибка. Игрок которому вы пытаитесь отправить не на сервере ");
+                                        $sender->sendMessage(ItemSend::Prfix."§4Ошибка§e. Игрок которому вы пытаитесь отправить не на сервере ");
                                     }
                                 } else {
-                                    $sender->sendMessage(ItemSend::Prfix."Ошибка. Вы не написали ник игрока");
+                                    $sender->sendMessage(ItemSend::Prfix."§4Ошибка§e. Вы не написали ник игрока");
                                 }
                                 break;
-                            case 'accpet':
+                            case 'accept':
                                 if($this->session->getSessionData($sender->getName(), 'item') != NULL){
                                    $itemdata = explode(':', $this->session->getSessionData($sender->getName(), 'item'));
                                    $id = $itemdata[0];
@@ -105,13 +106,26 @@ class ItemSend extends PluginBase implements Listener {
                                    $count = $itemdata[2]; 
                                    $sender->getInventory()->addItem(Item::get($id, $damage, $count));
                                    $this->session->createSession(strtolower($sender->getName()), 'item', null);
-                                   $sender->sendMessage(ItemSend::Prfix.'Запрос успешно принят');
+                                   $sender->sendMessage(ItemSend::Prfix.'Запрос §aУспешно§e принят');
+                                   $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix."Игрок: {$sender->getName()} принял, запрос на отправку блоков");
                                 } else {
-                                    $sender->sendMessage(ItemSend::Prfix."Ошибка. Вам никто не отпрвлял запросов");
+                                    $sender->sendMessage(ItemSend::Prfix."§4Ошибка§f. §eВам ни кто не отпрвлял запросов");
                                 }
                                 break;
                                 case 'deny':
-                                    $sender->sendMessage(ItemSend::Prfix."Команда будет реализована в следушей версии");
+                                     if($this->session->getSessionData($sender->getName(), 'item') != NULL){
+                                  $itemdata = explode(':', $this->session->getSessionData($sender->getName(), 'item'));
+                                   $id = $itemdata[0];
+                                   $damage = $itemdata[1];
+                                   $count = $itemdata[2]; 
+                                    $this->session->createSession(strtolower($sender->getName()), 'item', null);
+                                   $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->getInventory()->addItem(Item::get($id, $damage, $count));
+                                    $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix."Игрок: {$sender->getName()} отменил отправку, блоки §aУспешно§е возврашины");
+                                    $sender->sendMessage(ItemSend::Prfix."§aУспешно§е отменено");
+                                   
+                                     } else {
+                                    $sender->sendMessage(ItemSend::Prfix."§4Ошибка§e. Вам никто не отпрвлял запросов");
+                                }
                                 break;
                                  default:
                                 if($args[0] == null){

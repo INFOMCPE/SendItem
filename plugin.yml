@@ -1,11 +1,11 @@
 name: ItemSend
 main: infomcpe\ItemSend
 author: Алексей
-version: 1.0
+version: 1.2
 api: [2.0.0, 3.0.0-ALPHA1, 3.0.0-ALPHA2, 3.0.0-ALPHA3, 3.0.0-ALPHA4]
 load: STARTUP
 website: infomcpe.ru
 commands:
     itemsend:
-        description: "Отправка предметов"
+        description: "Отправка придметов"
         aliases: [is]
