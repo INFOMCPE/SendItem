@@ -7,25 +7,48 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\utils\Utils;
+use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\utils\Config;
 use pocketmine\event\Listener;
-use pocketmine\plugin\Plugin;
+use pocketmine\utils\Utils; 
 use pocketmine\Server;
 use pocketmine\item\Item;
-use pocketmine\plugin\PluginDescription;
+use pocketmine\network\protocol\AddItemEntityPacket;
 
 class ItemSend extends PluginBase implements Listener {
      const Prfix = '§f[§aItemSend§f]§e ';
    public function onEnable(){
             $this->session = $this->getServer()->getPluginManager()->getPlugin("SessionAPI");
-            $this->getServer()->getPluginManager()->registerEvents($this, $this);
-             if ($this->getServer()->getPluginManager()->getPlugin("PluginDownloader")) {
-                            $this->getServer()->getScheduler()->scheduleAsyncTask(new CheckVersionTask($this, 326));
-                        }
+            if ($this->getServer()->getPluginManager()->getPlugin("PluginDownloader")) {
+            $this->getServer()->getScheduler()->scheduleAsyncTask(new CheckVersionTask($this, 326));
+            if($this->session == NULL){
+               if($this->getServer()->getPluginManager()->getPlugin("PluginDownloader")->getDescription()->getVersion() >= '1.4'){
+                   $this->getServer()->getPluginManager()->getPlugin("PluginDownloader")->installByID('SessionAPI');
+               }
+            }
         }
-        public function onChat(PlayerChatEvent $event) {
+         $this->getServer()->getPluginManager()->registerEvents($this, $this);
+   }
+   public function onLogin(PlayerLoginEvent $event){
+         $player = $event->getPlayer();
+         if($this->session->getSessionData(strtolower($player->getName()), 'displayMessage') != null){
+             $player->sendMessage($this->session->getSessionData(strtolower($player->getName()), 'displayMessage'));
+              $this->session->createSession(strtolower($player->getName()), 'displayMessage',NULL);
+         }
+      if($this->session->getSessionData(strtolower($player->getName()), 'additem') != null){
+          $player->sendMessage($this->session->getSessionData(strtolower($player->getName()), 'displayMessage'));
+             $itemdata = explode(':', $this->session->getSessionData(strtolower($player->getName()), 'additem'));
+              $id = $itemdata[0];
+              $damage = $itemdata[1];
+              $count = $itemdata[2]; 
+              $player->getInventory()->addItem(Item::get($id, $damage, $count));
+              $this->session->deleteSession(strtolower($player->getName()));
+      }
+       
+   }
+
+   public function onChat(PlayerChatEvent $event) {
             $player = $event->getPlayer();
             if($this->session->getSessionData(strtolower($player->getName()), 'getchat') == true){
                 $message = $event->getMessage();
@@ -42,7 +65,7 @@ class ItemSend extends PluginBase implements Listener {
                     $this->session->createSession($this->session->getSessionData(strtolower($player->getName()), 'sendto'), 'item', $id.':'.$damage.':'.$message);
                     $this->session->createSession($this->session->getSessionData(strtolower($player->getName()), 'sendto'), 'sendby', strtolower($player->getName()));
                     $this->getServer()->getPlayer($this->session->getSessionData(strtolower($player->getName()), 'sendto'))->sendMessage(ItemSend::Prfix."Игрок ".$player->getName().' Отправил вам '.Item::get($id)->getName()." в количестве: ".$message.". \nДля того чтобы получить напишите /is accept. Чтобы отклонить /is deny");
-                    $this->getServer()->getScheduler()->scheduleDelayedTask(new tpTimer($this, $this->session->getSessionData(strtolower($player->getName()), 'sendto')), 20*120);
+                    $this->getServer()->getScheduler()->scheduleDelayedTask(new tpTimer($this, $this->session->getSessionData(strtolower($player->getName()), 'sendto')), 20*60*0.5);
                     $player->sendMessage(ItemSend::Prfix."§aУспешно§e. Запрос на получение отправлен игроку ".$this->session->getSessionData(strtolower($player->getName()), 'sendto'));
                     } else {
                         $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. Пока вы проводили все ети действия игрок которому вы собирались отправить покинул сервер");
@@ -143,5 +166,15 @@ class ItemSend extends PluginBase implements Listener {
             }
                    
          }
+          public function curl_get_contents($url){
+  $curl = curl_init($url);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+  curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+  $data = curl_exec($curl);
+  curl_close($curl);
+  return $data;
+          }
 }
 
