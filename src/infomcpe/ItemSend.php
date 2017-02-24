@@ -19,9 +19,15 @@ use pocketmine\network\protocol\AddItemEntityPacket;
 class ItemSend extends PluginBase implements Listener {
      const Prfix = '§f[§aItemSend§f]§e ';
    public function onEnable(){
+            $this->saveDefaultConfig();
+               if(!file_exists($this->getDataFolder().'lang.json')){
+                   $this->languageInitialization();
+               }
+               
             $this->session = $this->getServer()->getPluginManager()->getPlugin("SessionAPI");
             if ($this->getServer()->getPluginManager()->getPlugin("PluginDownloader")) {
             $this->getServer()->getScheduler()->scheduleAsyncTask(new CheckVersionTask($this, 326));
+            
             if($this->session == NULL){
                if($this->getServer()->getPluginManager()->getPlugin("PluginDownloader")->getDescription()->getVersion() >= '1.4'){
                    $this->getServer()->getPluginManager()->getPlugin("PluginDownloader")->installByID('SessionAPI');
@@ -29,6 +35,9 @@ class ItemSend extends PluginBase implements Listener {
             }
         }
          $this->getServer()->getPluginManager()->registerEvents($this, $this);
+   }
+   public function onDisable() {
+       unlink($this->getDataFolder().'lang.json');
    }
    public function onLogin(PlayerLoginEvent $event){
          $player = $event->getPlayer();
@@ -64,19 +73,19 @@ class ItemSend extends PluginBase implements Listener {
                     $player->getInventory()->removeItem(Item::get($id, $damage, $message));
                     $this->session->createSession($this->session->getSessionData(strtolower($player->getName()), 'sendto'), 'item', $id.':'.$damage.':'.$message);
                     $this->session->createSession($this->session->getSessionData(strtolower($player->getName()), 'sendto'), 'sendby', strtolower($player->getName()));
-                    $this->getServer()->getPlayer($this->session->getSessionData(strtolower($player->getName()), 'sendto'))->sendMessage(ItemSend::Prfix."Игрок ".$player->getName().' Отправил вам '.Item::get($id)->getName()." в количестве: ".$message.". \nДля того чтобы получить напишите /is accept. Чтобы отклонить /is deny");
-                    $this->getServer()->getScheduler()->scheduleDelayedTask(new tpTimer($this, $this->session->getSessionData(strtolower($player->getName()), 'sendto')), 20*60*0.5);
-                    $player->sendMessage(ItemSend::Prfix."§aУспешно§e. Запрос на получение отправлен игроку ".$this->session->getSessionData(strtolower($player->getName()), 'sendto'));
+                    $this->getServer()->getPlayer($this->session->getSessionData(strtolower($player->getName()), 'sendto'))->sendMessage(ItemSend::Prfix.$this->lang('player').": ".$player->getName().' '.$this->lang("send_you").' '.Item::get($id)->getName()." ". $this->lang('in_count').": ".$message.". ".$this->lang("is_send"));
+                    $this->getServer()->getScheduler()->scheduleDelayedTask(new tpTimer($this, $this->session->getSessionData(strtolower($player->getName()), 'sendto')), 20*120);
+                    $player->sendMessage(ItemSend::Prfix.$this->lang("success_sendto").$this->session->getSessionData(strtolower($player->getName()), 'sendto'));
                     } else {
-                        $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. Пока вы проводили все ети действия игрок которому вы собирались отправить покинул сервер");
+                        $player->sendMessage(ItemSend::Prfix.$this->lang("no_online"));
                          $event->setCancelled(TRUE);
                     }
                     } else {
-                        $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. В вашем инвентаре меньше блоков чем вы указали");
+                        $player->sendMessage(ItemSend::Prfix.$this->lang("no_blocks"));
                          $event->setCancelled(TRUE);
                     }
                 }else{
-                    $player->sendMessage(ItemSend::Prfix."§4Ошибка§f. Пожалуйста напишите количество в виде числа");
+                    $player->sendMessage(ItemSend::Prfix.$this->lang("is_numeric"));
                      $event->setCancelled(TRUE);
                 }
             }
@@ -90,10 +99,10 @@ class ItemSend extends PluginBase implements Listener {
              $this->session->createSession(strtolower($player->getName()), 'item', $event->getItem()->getId().':'.$event->getItem()->getDamage().':'.$event->getItem()->getCount());
              $this->session->createSession(strtolower($player->getName()), 'getchat', true);
              $this->session->createSession(strtolower($player->getName()), 'sendto', $sendto);
-             $player->sendMessage(ItemSend::Prfix.'Предмет §aУспешно§e получен теперь напишите в чат количиство которе xотите отправить');
+             $player->sendMessage(ItemSend::Prfix.$this->lang("item_successfully_received"));
              $event->setCancelled(TRUE);
          } else {
-             $player->sendMessage(ItemSend::Prfix."§4Ошибка§f.§e Траспортировка воздуxа запрещена!");
+             $player->sendMessage(ItemSend::Prfix.$this->lang("air_transport_forbidden"));
          }
          
              }
@@ -104,7 +113,7 @@ class ItemSend extends PluginBase implements Listener {
 		switch($command->getName()){
                     case 'itemsend':
                         if(count($args) == 0){
-                              $sender->sendMessage("§6/is send [ник] - отправить предмет \n§6/is accept - Получить отправленый предмет \n§6/is deny - Отклонить отправленый придмет");
+                              $sender->sendMessage($this->lang("all_cmd"));
                             break; 
                         }
                           switch ($args[0]) {
@@ -113,12 +122,12 @@ class ItemSend extends PluginBase implements Listener {
                                     if($this->getOnline($args[1])){
                                         $this->session->createSession(strtolower($sender->getName()), 'senditem', TRUE);
                                          $this->session->createSession(strtolower($sender->getName()), 'sendto', strtolower($args[1]));
-                                        $sender->sendMessage(ItemSend::Prfix."§aУспешно§e. Нажмите по земле тем предметом который xотите отправить");
+                                        $sender->sendMessage(ItemSend::Prfix.$this->lang("send_successfully"));
                                     } else {
-                                        $sender->sendMessage(ItemSend::Prfix."§4Ошибка§e. Игрок которому вы пытаитесь отправить не на сервере ");
+                                        $sender->sendMessage(ItemSend::Prfix.$this->lang("offline_player"));
                                     }
                                 } else {
-                                    $sender->sendMessage(ItemSend::Prfix."§4Ошибка§e. Вы не написали ник игрока");
+                                    $sender->sendMessage(ItemSend::Prfix.$this->lang("no_player"));
                                 }
                                 break;
                             case 'accept':
@@ -129,10 +138,10 @@ class ItemSend extends PluginBase implements Listener {
                                    $count = $itemdata[2]; 
                                    $sender->getInventory()->addItem(Item::get($id, $damage, $count));
                                    $this->session->createSession(strtolower($sender->getName()), 'item', null);
-                                   $sender->sendMessage(ItemSend::Prfix.'Запрос §aУспешно§e принят');
-                                   $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix."Игрок: {$sender->getName()} принял, запрос на отправку блоков");
+                                   $sender->sendMessage(ItemSend::Prfix.$this->lang('success_taken'));
+                                   $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix.$this->lang("player").":".$sender->getName().$this->lang('received_request'));
                                 } else {
-                                    $sender->sendMessage(ItemSend::Prfix."§4Ошибка§f. §eВам ни кто не отпрвлял запросов");
+                                    $sender->sendMessage(ItemSend::Prfix.$this->lang("no_requests"));
                                 }
                                 break;
                                 case 'deny':
@@ -143,16 +152,17 @@ class ItemSend extends PluginBase implements Listener {
                                    $count = $itemdata[2]; 
                                     $this->session->createSession(strtolower($sender->getName()), 'item', null);
                                    $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->getInventory()->addItem(Item::get($id, $damage, $count));
-                                    $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix."Игрок: {$sender->getName()} отменил отправку, блоки §aУспешно§е возврашины");
-                                    $sender->sendMessage(ItemSend::Prfix."§aУспешно§е отменено");
+                                    $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix.$this->lang('player').":".$sender->getName().$this->lang('undo_send'));
+                                    $sender->sendMessage(ItemSend::Prfix.$this->lang('success_canceled'));
                                    
                                      } else {
-                                    $sender->sendMessage(ItemSend::Prfix."§4Ошибка§e. Вам никто не отпрвлял запросов");
-                                }
+                                   $sender->sendMessage(ItemSend::Prfix.$this->lang("no_requests"));
+                                   
+                                     }
                                 break;
                                  default:
                                 if($args[0] == null){
-                                $sender->sendMessage(ItemSend::Prfix."Суб команда не найдена");
+                                $sender->sendMessage(ItemSend::Prfix.$this->lang('no_sub-command'));
                                 }
                                  break;
                           }
@@ -166,6 +176,39 @@ class ItemSend extends PluginBase implements Listener {
             }
                    
          }
+         public function languageInitialization(){
+             switch ($this->getConfig()->get("lang")) {
+                 case 'rus':
+                    $this->saveResource('rus.json');
+                     if(file_exists($this->getDataFolder().'lang.json')){
+                         unlink($this->getDataFolder().'lang.json');
+                     }
+                     rename($this->getDataFolder().'rus.json', $this->getDataFolder().'lang.json');
+
+                     break;
+                     case 'eng':
+                    $this->saveResource('eng.json');
+                     if(file_exists($this->getDataFolder().'lang.json')){
+                         unlink($this->getDataFolder().'lang.json');
+                     }
+                     rename($this->getDataFolder().'eng.json', $this->getDataFolder().'lang.json');
+
+                     break;
+
+                 default:
+                     $this->saveResource('rus.json');
+                     if(file_exists($this->getDataFolder().'lang.json')){
+                         unlink($this->getDataFolder().'lang.json');
+                     }
+                     rename($this->getDataFolder().'rus.json', $this->getDataFolder().'lang.json');
+                     break;
+             }
+         }
+
+         public function lang($phrase){
+        $file = json_decode(file_get_contents($this->getDataFolder()."lang.json"), TRUE);
+        return $file["{$phrase}"];
+		}
           public function curl_get_contents($url){
   $curl = curl_init($url);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

@@ -1,0 +1,28 @@
+{
+    
+    "success_sendto": "§aSuccess§e. Requst for sending player ",
+    "all_cmd": "§6/is send [nickname] - send item \n§6/is accept - Teke item \n§6/is deny - Reject sent item",
+    "success_taken": "Request §aSuccess§e accept",
+    "no_requests": "§4Error§f. §eNo found send requests",
+    "success_canceled": "§aSuccess§е canceled",
+    "player": "Player",
+    "undo_send": "отменил отправку, блоки §aУспешно§е возврашины",
+    "received_request": "принял, запрос на отправку блоков",
+    "no_online": "§4Ошибка§f. Пока вы проводили все эти действия игрок которому вы собирались отправить покинул сервер",
+    "no_blocks": "§4Ошибка§f. В вашем инвентаре меньше блоков чем вы указали",
+    "send_you": "Отправил вам",
+    "in_count":"в количестве",
+    "is_send": "\nДля того чтобы получить напишите /is accept. Чтобы отклонить /is deny",
+    "is_numeric":"§4Ошибка§f. Пожалуйста напишите количество в виде числа",
+    "item_successfully_received": "Предмет §aУспешно§e получен теперь напишите в чат количиство которе xотите отправить",
+    "air_transport_forbidden": "§4Ошибка§f.§e Траспортировка воздуxа запрещена!",
+    "send_successfully": "§aУспешно§e. Нажмите по земле тем предметом который xотите отправить",
+    "offline_player": "§4Ошибка§e. Игрок которому вы пытаитесь отправить не на сервере",
+    "no_player": "§4Ошибка§e. Вы не написали ник игрока",
+    "no_sub-command": "Суб команда не найдена",
+    "timer-1": "Исчерпано время на отправку блоков для: {$this->nickname}, блоки §aуспешно§f возврашины",
+    "timer-2": "Вы не приняли запрос от {$this->main->session->getSessionData($this->nickname, 'sendby')}, отпрвка отменена",
+    "timer-3": "Пока вас не было игрок {$this->nickname} не принял ваш запрос, придметы возврашины",
+    "timer-4": "Вы не приняли запрос от {$this->main->session->getSessionData($this->nickname, 'sendby')}, отпрвка отменена"
+    
+        }
