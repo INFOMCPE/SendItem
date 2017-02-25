@@ -62,10 +62,11 @@ class ItemSend extends PluginBase implements Listener {
             if($this->session->getSessionData(strtolower($player->getName()), 'getchat') == true){
                 $message = $event->getMessage();
                 if(is_numeric($message)){
-                    $itemdata = explode(':', $this->session->getSessionData(strtolower($player->getName()), 'item'));
+                     $itemdata = explode(':', $this->session->getSessionData(strtolower($player->getName()), 'item'));
                     $id = $itemdata[0];
                     $damage = $itemdata[1];
                     $count = $itemdata[2];
+                    if($player->getInventory()->canAddItem(Item::get($id, $damage, $message))){
                     if($message <= $count){
                     $this->session->createSession(strtolower($player->getName()), 'getchat', FALSE);
                     $event->setCancelled(TRUE);
@@ -76,6 +77,8 @@ class ItemSend extends PluginBase implements Listener {
                     $this->getServer()->getPlayer($this->session->getSessionData(strtolower($player->getName()), 'sendto'))->sendMessage(ItemSend::Prfix.$this->lang('player').": ".$player->getName().' '.$this->lang("send_you").' '.Item::get($id)->getName()." ". $this->lang('in_count').": ".$message.". ".$this->lang("is_send"));
                     $this->getServer()->getScheduler()->scheduleDelayedTask(new tpTimer($this, $this->session->getSessionData(strtolower($player->getName()), 'sendto')), 20*120);
                     $player->sendMessage(ItemSend::Prfix.$this->lang("success_sendto").$this->session->getSessionData(strtolower($player->getName()), 'sendto'));
+                    
+                    
                     } else {
                         $player->sendMessage(ItemSend::Prfix.$this->lang("no_online"));
                          $event->setCancelled(TRUE);
@@ -83,6 +86,9 @@ class ItemSend extends PluginBase implements Listener {
                     } else {
                         $player->sendMessage(ItemSend::Prfix.$this->lang("no_blocks"));
                          $event->setCancelled(TRUE);
+                    }
+                    }else{
+                        $player->sendMessage($this->lang('no_inventory'));
                     }
                 }else{
                     $player->sendMessage(ItemSend::Prfix.$this->lang("is_numeric"));
@@ -94,6 +100,7 @@ class ItemSend extends PluginBase implements Listener {
          $player = $event->getPlayer();
          if($this->session->getSessionData($player->getName(), 'senditem') == TRUE){
              if($event->getItem()->getId() != 0){
+                 
              $sendto = $this->session->getSessionData($player->getName(), 'sendto'); 
              $this->session->deleteSession($player->getName());
              $this->session->createSession(strtolower($player->getName()), 'item', $event->getItem()->getId().':'.$event->getItem()->getDamage().':'.$event->getItem()->getCount());
@@ -160,10 +167,13 @@ class ItemSend extends PluginBase implements Listener {
                                    
                                      }
                                 break;
+                            case 'setlang':
+                                
+                                break;
                                  default:
-                                if($args[0] == null){
+                                
                                 $sender->sendMessage(ItemSend::Prfix.$this->lang('no_sub-command'));
-                                }
+                                
                                  break;
                           }
                 }

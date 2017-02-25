@@ -24,16 +24,16 @@ class tpTimer extends PluginTask{
                                         
                                         $this->main->session->createSession(strtolower($this->nickname), 'item', null);
                                    $this->main->getServer()->getPlayer($this->main->session->getSessionData($this->nickname, 'sendby'))->getInventory()->addItem(Item::get($id, $damage, $count));
-                                    $this->main->getServer()->getPlayer($this->main->session->getSessionData($this->nickname, 'sendby'))->sendMessage(ItemSend::Prfix.$this->main->lang('timer-4'));
-                                    $this->main->getServer()->getPlayer($this->nickname)->sendMessage(ItemSend::Prfix.$this->main->lang('timer-2'));
+                                    $this->main->getServer()->getPlayer($this->main->session->getSessionData($this->nickname, 'sendby'))->sendMessage(ItemSend::Prfix.str_replace('{1}', $this->nickname, $this->main->lang('timer-1')));
+                                    $this->main->getServer()->getPlayer($this->nickname)->sendMessage(ItemSend::Prfix.str_replace('{1}', $this->main->session->getSessionData($this->nickname, 'sendby'), $this->main->lang('timer-2')));
                                     } elseif ($this->main->getOnline($this->main->session->getSessionData($this->nickname, 'sendby')) == FALSE) {
-                                        $this->main->session->createSession(strtolower($this->main->session->getSessionData($this->nickname, 'sendby')), 'displayMessage', ItemSend::Prfix.$this->main->lang('timer-3'));
+                                        $this->main->session->createSession(strtolower($this->main->session->getSessionData($this->nickname, 'sendby')), 'displayMessage', ItemSend::Prfix.str_replace('{1}', $this->nickname, $this->main->lang('timer-3')));
                                         $this->main->session->createSession(strtolower($this->main->session->getSessionData($this->nickname, 'sendby')), 'additem', $this->main->session->getSessionData($this->nickname, 'item'));
                                     }
                                     if($this->main->getOnline($this->nickname) == FALSE){
-                                        $this->main->session->createSession(strtolower($this->main->session->getSessionData($this->nickname, 'sendby')), 'displayMessage', ItemSend::Prfix.$this->main->lang('timer-4'));
+                                        $this->main->session->createSession(strtolower($this->main->session->getSessionData($this->nickname, 'sendby')), 'displayMessage', ItemSend::Prfix.str_replace('{1}', $this->main->session->getSessionData($this->nickname, 'sendby'), $this->main->lang('timer-4')));
                                     } elseif ($this->main->getOnline($this->nickname) == TRUE) {
-                                        $this->main->getServer()->getPlayer($this->nickname)->sendMessage(ItemSend::Prfix.$this->main->lang('timer-4'));
+                                        $this->main->getServer()->getPlayer($this->nickname)->sendMessage(ItemSend::Prfix.str_replace('{1}', $this->main->session->getSessionData($this->nickname, 'sendby'), $this->main->lang('timer-4')));
                                     
                                     }
                                         
