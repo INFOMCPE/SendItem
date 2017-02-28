@@ -7,7 +7,7 @@
 "success_canceled": "§aSuccessful§е declined", 
 "player": "Player", 
 "undo_send": "canceled, blocks §aSuccessful§е returned", 
-"received_request": "accepted request", 
+"received_request": "accepted request",  
 "no_online": "§4Error§f. Player, what you want to send items, isn't online", 
 "no_blocks": "§4Error§f. You haven't enough items", 
 "send_you": "Sended to you", 
@@ -21,7 +21,7 @@
 "no_player": "§4Error§e. Write nickname", 
 "no_sub-command": "Sub-command not found", 
 "no_inventory": "Not enough space in getter's inventory", 
-
+"no_creative": "§4Error§у. Send to a creative mode is forbidden",
 "timer-1": "Time expired for: {1}, items §asuccessful§f returned", 
 "timer-2": "You declined request from {1}", 
 "timer-3": "Player {1} declined your request. Items returned", 

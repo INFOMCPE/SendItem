@@ -66,7 +66,7 @@ class ItemSend extends PluginBase implements Listener {
                     $id = $itemdata[0];
                     $damage = $itemdata[1];
                     $count = $itemdata[2];
-                    if($player->getInventory()->canAddItem(Item::get($id, $damage, $message))){
+                    
                     if($message <= $count){
                     $this->session->createSession(strtolower($player->getName()), 'getchat', FALSE);
                     $event->setCancelled(TRUE);
@@ -87,9 +87,7 @@ class ItemSend extends PluginBase implements Listener {
                         $player->sendMessage(ItemSend::Prfix.$this->lang("no_blocks"));
                          $event->setCancelled(TRUE);
                     }
-                    }else{
-                        $player->sendMessage($this->lang('no_inventory'));
-                    }
+                   
                 }else{
                     $player->sendMessage(ItemSend::Prfix.$this->lang("is_numeric"));
                      $event->setCancelled(TRUE);
@@ -127,27 +125,37 @@ class ItemSend extends PluginBase implements Listener {
                             case 'send':
                                 if($args[1] != NULL){
                                     if($this->getOnline($args[1])){
+                                        if($sender->getGamemode() != 0){
+                                            $sender->sendMessage(ItemSend::Prfix.$this->lang('no_creative'));
+                                        } else {
                                         $this->session->createSession(strtolower($sender->getName()), 'senditem', TRUE);
                                          $this->session->createSession(strtolower($sender->getName()), 'sendto', strtolower($args[1]));
                                         $sender->sendMessage(ItemSend::Prfix.$this->lang("send_successfully"));
+                                        }
                                     } else {
                                         $sender->sendMessage(ItemSend::Prfix.$this->lang("offline_player"));
                                     }
                                 } else {
                                     $sender->sendMessage(ItemSend::Prfix.$this->lang("no_player"));
-                                }
+                                } 
                                 break;
                             case 'accept':
                                 if($this->session->getSessionData($sender->getName(), 'item') != NULL){
-                                   $itemdata = explode(':', $this->session->getSessionData($sender->getName(), 'item'));
+                                     $itemdata = explode(':', $this->session->getSessionData($sender->getName(), 'item'));
                                    $id = $itemdata[0];
                                    $damage = $itemdata[1];
                                    $count = $itemdata[2]; 
+                                    if($sender->getInventory()->canAddItem(Item::get($id, $damage, $count))){
+                                  
                                    $sender->getInventory()->addItem(Item::get($id, $damage, $count));
                                    $this->session->createSession(strtolower($sender->getName()), 'item', null);
                                    $sender->sendMessage(ItemSend::Prfix.$this->lang('success_taken'));
                                    $this->getServer()->getPlayer($this->session->getSessionData($sender->getName(), 'sendby'))->sendMessage(ItemSend::Prfix.$this->lang("player").":".$sender->getName().$this->lang('received_request'));
-                                } else {
+                                 }else{
+                        $senderr->sendMessage($this->lang('no_inventory'));
+                    }
+                                   
+                                    } else {
                                     $sender->sendMessage(ItemSend::Prfix.$this->lang("no_requests"));
                                 }
                                 break;

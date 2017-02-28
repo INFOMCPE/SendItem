@@ -9,7 +9,7 @@ class tpTimer extends PluginTask{
 	
 	public function __construct($main, $nickname){
             $this->nickname = $nickname;
-            $this->main = $main;
+            $this->main = $main; 
             parent::__construct($main);
 	}
 	
