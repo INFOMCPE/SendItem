@@ -212,6 +212,14 @@ class ItemSend extends PluginBase implements Listener {
                      rename($this->getDataFolder().'eng.json', $this->getDataFolder().'lang.json');
 
                      break;
+                      case 'jpn':
+                    $this->saveResource('jpn.json');
+                     if(file_exists($this->getDataFolder().'lang.json')){
+                         unlink($this->getDataFolder().'lang.json');
+                     }
+                     rename($this->getDataFolder().'jpn.json', $this->getDataFolder().'lang.json');
+
+                     break;
 
                  default:
                      $this->saveResource('rus.json');

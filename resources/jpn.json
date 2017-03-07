@@ -1,0 +1,31 @@
+{
+
+"success_sendto": "§aアイテムを送りました。",
+"all_cmd": "§6/is send [名前] - アイテムを送ります\n§6/is accept -送信されたアイテムを取得します\n§6/is deny - 送信されたアイテムを拒否します",
+"success_taken": "§a成功しました。",
+"no_requests": "§4Error§f. §eリクエストは届いていません。",
+"success_canceled": "§a受信を拒否しました。",
+"player": "プレイヤー",
+"undo_send": "§aキャンセルしました。",
+"received_request": "リクエストを受け取りました。",
+"no_online": "§4Error§f. 指定のプレイヤーはオンラインではありません。",
+"no_blocks": "§4Error§f. 必要なアイテムがありません。",
+"send_you": "送信しました。",
+"in_count":"数",
+"is_send": "\nアイテム送信を受け入れる場合  /is accept.\nアイテム送信を拒否する場合  /is deny",
+"is_numeric":"§4Error§f.個数を記入してください。",
+"item_successfully_received": "成功しました。 さて、あなたは何をしたいのですか？",
+"air_transport_forbidden": "§4Error§f.§e 空気ブロックを送ることはできません!",
+"send_successfully": "§a成功しました。§e送信したいものをタップします",
+"offline_player": "§4Error§e. プレイヤーはオフラインです。",
+"no_player": "§4Error§e.名前を記入してください。",
+"no_creative": "§4Error§6クリエイティブモードでは行えません。",
+"no_sub-command": "§c>>このサブコマンドは存在しません。",
+"no_inventory": "§c>>インベントリにスペースがないようです。",
+
+"timer-1": "有効期限: {1}, §aアイテムは返却されます。",
+"timer-2": "あなたは {1} からのリクエストを拒否しました。",
+"timer-3": "{1} はあなたのリクエストをキャンセルしました。\n>>アイテムは返却されます。",
+"timer-4": "あなたは {1} からのリクエストを拒否しました。"
+
+}
