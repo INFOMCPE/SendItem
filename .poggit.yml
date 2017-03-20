@@ -3,5 +3,5 @@ branches:
 - master
 projects:
   SendItem:
-    path: "/326.jpg"
+    path: "326.jpg"
 ...
